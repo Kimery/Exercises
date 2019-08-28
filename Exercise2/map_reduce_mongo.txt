@@ -1,0 +1,27 @@
+--MongoDB script
+
+db.measures.mapReduce(
+
+  function () {	
+    emit( this.date.substring(0,7).trim(),{"measure":this.measure,"count":1});
+  },  
+  function(keys, values) {
+  
+  reducedVal = { "measure" : 0 ,"count" : 0}; 
+  values.forEach(function(value) {
+          
+          reducedVal.measure += value.measure;
+          reducedVal.count += value.count;
+      });
+      return reducedVal;     
+ },
+ {
+      "out": "map_reduce_result" , 
+      "finalize": function(key, reduceVal) { 
+          reduceVal.avg = reduceVal.measure / reduceVal.count; 
+          return reduceVal;  
+
+ }})
+
+
+
